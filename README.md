@@ -1,6 +1,17 @@
-# horosc-Excel
+# Horosc for Excel
 
-Porting John D. North's historical domification program Horosc to Microsoft Excel (VBA)
+[![en](https://img.shields.io/badge/lang-en-red.svg)](/README.md)
+[![fr](https://img.shields.io/badge/lang-fr-blue.svg)](/README.fr.md)
+
+## Project background
+
+John D. North's book, *Horoscopes and History*, London: Warburg Institute, 1986, published in an appendix (appendix 4, pp. 197-218) the Pascal for MS-DOS code of an application entitled **HOROSC** and designed to calculate and check the domification of a horoscope using the seven main historical methods.
+
+Due to the obsolescence of the Pascal language, this application became very difficult to access. Launched in 2021, the project _Horosc for Google Sheets_ ported the code to Google Script for use in Google Sheets.
+
+The way Google Apps Script works favors the execution of complete methods (like those of the initial Horosc program) at the expense of more flexible use of intermediate functions. This project, launched in 2025, ports the code to VBA for Microsoft Excel, creating a wider range of functions to be combined in different and more customized way.
+
+It is currently inprogress.
 
 ## Proposition for two methods of computation
 
