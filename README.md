@@ -65,89 +65,83 @@ Unlike in ARRAYS, each cell of METHOD A and METHOD B is the result of a single f
 > 
 > When comparing with data from the original North programme, or with _[Horosc for Google Sheets](https://github.com/Turbehrt/horosc-GoogleSheets)_, note that resulting longitudes, right ascensions and geographical latitudes are expected to be expressed in sexagesimal degrees, but quality coefficients in radians.
 
+## Calculation methods and intermediate functions
+
+### Sequences
+
+The two methods perform the calculations as follows:
+
+* Method A (`computeLongitudesAllMethodsLatitude`)
+  - conversion of inputs to radians
+  - calculation of the right ascension of the ascendant
+  - calculation of the right ascension of the *Imum Coeli* (using the ascensional difference)
+  - calculation of the longitude of the *Imum Coeli*
+  - calling each method and converting the results to degrees (sexagesimal)
+  - display of results
+
+* Method B (`computeLongitudesAllMethodsLongitude`)
+  - conversion of inputs to radians
+  - extraction of the longitude of the ascendant and *Imum Coeli*
+  - calculation of the right ascensions of the ascendant and *Imum Coeli*
+  - calculation of the theoretical latitude of the observation site
+  - calling each method and converting the results to (sexagesimal) degrees
+  - calculation of quality coefficients (in radians)
+  - conversion of the margin of error into radians and calculation of a latitude interval:
+    + at the centre, the theoretical value (based on the ascendant and *Imum Coeli* provided)
+    + vertically, the values in case of error/approximation of the right ascension of the ascendant
+    + horizontally, the values in case of error/approximation of the right ascension of the *Imum Coeli*
+  - display of results
+
+### Intermediate functions
+
+> [!IMPORTANT]
+> All custom formulas are coded in three interdependent VBA modules: **Trigonometry** (basic sexagesimal conversions), **Domification** (individual calculations) and **Sequences** (global functions chaining individual opeartions).
+
+* **Angle calculation** (from _Trigonometry_)
+  + `ModuloRange`, `ModuloTwoPI`
+  + `SplitSexagesimalFormat`, `SexagesimalFormat`: extracts the individual numbers and separators used in the input string
+  +  `SexagesimalToRadian`: converts a sexagesimal number to radians
+  +  `RadianToSexagesimal`: converts a number in radians to degrees, using a set of separators (optional)
+
+* **Celestial Coordinates** (from _Domification_)
+  + `EclipticToEquator(obliquity, longitude)`: converts ecliptic longitude to right ascension (given the obliquity of the ecliptic).
+  + `EquatorToEcliptic(obliquity, rightAscension)`: converts right ascension to ecliptic longitude (given the obliquity of the ecliptic).
+  + `RetrieveLatitude(obliquity, rightASC, rightIMC)` (radians), `RetrieveLatitudeSexagesimal` (degrees): calculates the theoretical latitude of the observation site based on the obliquity of the ecliptic and the right ascensions of the Ascendant and *Imum Coeli* (IMC).
+  + `RetrieveLatitudeFromLong(obliquity, longASC, longIMC)` (radians), `RetrieveLatitudeFromLongSexagesimal` (degrees): calculates the theoretical latitude based on the obliquity and the ecliptic longitudes of the Ascendant and *Imum Coeli* (IMC).
+  + `RetrieveLatitudeRange(obliquity, longASC, longIMC, error, direction)` (radians), `RetrieveLatitudeRangeSexagesimal` (degrees): applies an error margin (`error`) to the latitude calculation, following the "cross" method proposed by North.
+    * `direction = 0`: no error (identical to `retrieveLatitude`).
+    * `direction = 1` (up) or `direction = 2` (down): error margin applied to the Ascendant's longitude.
+    * `direction = 3` (left) or `direction = 4` (right): error margin applied to the *Imum Coeli*'s longitude.
+
+> [!IMPORTANT]
+> The `RetrieveLatitudeRange` formula fixes inconsistencies found in the original PASCAL code. Consequently, it does not return the same results as the PASCAL program or version 1 of *Horosc for Google Sheets*, but it is consistent with version 2 of *Horosc for Google Sheets*. See [Differences with J.D. North's original program](#differences-with-jd-norths-original-program) for more details, anf how to emulate the original formula.
+
+* **House Division**  (from _Domification_): for each calculation method, functions `Method0(obliquity, geoLatitude, rightASC, rightIMC, houseIndex, getRA)` through `Method6` return either the right ascension (`getRA = true`) or the longitude (`getRA = false`) of a house cusp (`houseIndex` from 1 to 6). Inputs and results are in radians.
+  + `Method0`: _Hour Lines method_ (fixed boundaries). Cusps are the intersections of the ecliptic with the horizon, the meridian, and the unequal (even) hour lines. This method is traditionally graphical (using an astrolabe), emulated here via a convergence function (`Converge`).
+  + `Method1`: _Standard method_, known as Alcabitius. Uniform division of the equatorial cardinal sectors.
+  + `Method2`: _Dual longitude method_. Uniform division of the ecliptic cardinal sectors.
+  + `Method3`: _Prime Vertical method_ (fixed boundaries). Uniform division of the Prime Vertical.
+  + `Method4`: _Equatorial method_ (fixed boundaries). Uniform division of the equator on the local sphere.
+  + `Method5`: _Equatorial method_ (moving boundaries). Uniform division of the equator on the celestial sphere.
+  + `Method6`: _Single Longitude method_. Uniform division of the ecliptic.
+
+> [!NOTE]
+> Detailed explanation and historical use of each method are to be found by John D. North, *Horoscopes and History*, London: Warburg Institute, 1986.
+
+* **Quality Coefficients**
+  + `QualityCoefficientRadian(observedLongitude, computedLongitude)`, `QualityCoefficientDegree`: these represent the difference between an observed longitude (as transcribed from a historical source) and a calculated longitude.
+
+> [!NOTE]
+> Note that in the original North programme, quality coefficients are expressed in radians, while all other quantities are in sexagesimal degrees.
 
 
+* **Global functions** (from _Sequences_): these allow for chained conversions based on available inputs.
+  + `computeCuspWithMethodInRadian(obliquity, geoLatitude, rightASC, longASC, rightIMC, longIMC, houseIndex, method, getRA)`: computes the coordinates (right ascension or longitude) of the cusp of any house (1-6), based on any method (0-6), using all known parameters: obliquity, geographical latitude, right ascensions and longitudes of the Ascendant and _Immum Coeli_ (in radians)
+  + `computeCuspFromLatitudeInRadian(obliquity, geoLatitude, longASC, houseIndex, method, getRA)`: computes the coordinates (right ascension or longitude) of the cusp of any house (1-6), based on any method (0-6), using the Ascendant's longitude and the geographic latitude (in radians) -- without knowing the coordinates of the _Immum Coeli_.
+  + `computeCuspFromLatitudeInSexagesimal`: computes the coordinates (right ascension or longitude) of the cusp of any house (1-6), based on any method (0-6), using the Ascendant's longitude and the geographic latitude (in degrees).
+  + `computeCuspFromLongitudeInRadian(obliquity, longASC, longIMC, houseIndex, method, getRA)`: computes the coordinates (right ascension or longitude) of the cusp of any house (1-6), based on any method (0-6), using the longitudes of the Ascendant and _Immum Coeli_ (in radians).
+  + `computeCuspFromLongitudeInSexagesimal`: computes the coordinates (right ascension or longitude) of the cusp of any house (1-6), based on any method (0-6), using the longitudes of the Ascendant and _Immum Coeli_ (in degrees).
 
-## The 7 methods for computing cusp of houses
-
-## Convention names
-
-- Obliquity is the obliquity of the ecliptic
-- geoLat is the geographical latitude of the place (usually phi), equivalent to the elevation of the poles (over the horizon)
-- ascensionalDifference is the ascensional difference (right ascendant - right ascension of the vernal point)
-
-Any domification methods computes the cusps of each House (1 to 6, with houses 7 to 12 being symetrical).They come as right Ascensions (on the equinox, usually noted alpha) or longitudes (on the ecliptic, usually noted lambda).
-
-Meaningful cusps are the Ascendant (Asc, cusp of House 1, intersection of ecliptic and horizon) and the Immum Caeli (IMC, cusp of House 4, intersection of ecliptic and night meridian)
-
-right ascension of the ascendant - ascensional difference = right ascension of the IMC - 90°
-Houses 7 to 12 are symetrical to Houses  to 6 in all methods (cusp + 180)
-
-## Implementation of the computations in EXCEL VBA
-
-Using a spreadsheet to layout a presentation of results of computations imply that the hroscope computations must be provided under the form of funtions.
-We built a set of function that make easy to build a presentation or what you want to show.
-
-The core part of these functions are:
-
-- the 7 historical methods of computing the cusp of houses
-- the logic to compute geographical latitude based on ascendant and IMC, although this function could be replaced by a formula using standard functions of XL
-these core functions are implemented using angles in radian.
-
-Other functions are only helper functions
-
-- Basic trigonometry transformations
-- Convenient way to invoke the core functions with transformation of parametres or call historical methods based on simple index.
-
-## Examples provided on the spreadsheet
-
-## In the details of the code provided
-
-### Sexagesimal, Radians and Degrees
-
-### Available functions
-
-| **module** | **content** |
-| :--- | :--- |
-|||
-
-#### Core module : Domification
-
-There are 7 methods (numbered 0 to 6) to compute the cusp of house.
-Each method take input parameters:
-
-- Obliquity, geographic Latitude: values expected in radian
-- One or several of: Right Ascendant, Long Ascendant, right IMC, long IMC - values expected in radian
-- the houseIndex indicating which cusp to compute - value from 1 to 6
-- an optional bolean to indicate waht value return:
-  - FALSE (or not provided) - returm the cusp right Ascendion in radian
-  - TRUE - return the cusp longitude in radian
-
-| **function** | **parameters** | **description and usage** |
-| :---: | :-------- | :-------- |
-|**Method0**<br><br>**Hour Lines<br>(fixed boundaries)**|- obliquity<br>- geographic Latitude<br>- right Ascendant<br>- right IMC<br>- houseIndex<br>- RA or Long|Cusps are intersections of the ecliptic by the horizon, the meridian circle, and the unequal hour lines on the sphere for even-numbered hours<br><br>This method is usually graphical, with aid of an astrolabe.<br>It is emulated using a convergence function|
-|**Method1**<br><br>**Standard method (Alcabitius)**|- obliquity<br>- geographic Latitude<br>- right Ascendant<br>- right IMC<br>- houseIndex<br>- RA or Long|Uniform division of of the cardinal sectors of the Equator|
-|**Method2**<br><br>**Dual longitude**|- obliquity<br>- geographic Latitude<br>- long Ascendant<br>- long IMC<br>- houseIndex<br>- RA or Long|Uniform division of cardinal sectors of the Ecliptic|
-|**Method3**<br><br>**Prime Vertical (fixed boundaries)**|- obliquity<br>- geographic Latitude<br>- right IMC<br>- long IMC<br>- houseIndex<br>- RA or Long|Uniform division of the Prime Vertical|
-|**Method4**<br><br>**Equatorial (fixed boundaries)**|- obliquity<br>- geographic Latitude<br>- right IMC<br>- long IMC<br>- houseIndex<br>- RA or Long|Uniform division of the Equator (local sphere)|
-|**Method5**<br><br>**Equatorial (moving boundaries)**|- obliquity<br>- geographic Latitude<br>- right Ascendant<br>- houseIndex<br>- RA or Long|Uniform division of the Equator (celestial sphere)|
-|**Method6**<br><br>**Single longitudes**|- obliquity<br>- geographic Latitude<br>- long Ascendant<br>- houseIndex<br>- RA or Long|Uniform division of the Ecliptic|
-
-Some other useful function for conversion of coordinate:
-
-| **function** | **parameters**| **description and usage** |
-| :--- | :--- | :--- |
-|**EclipticToEquator**|- Obliquity<br>- longitutde| transform the longitude in right ascension |
-|**EquatorToEcliptic**|- Obliquity<br>- right ascension| transform the right ascension into a longitude|
-|**retrieveLatitude**|- Obliquity<br>- right Ascendant<br>- right IMC|compute the geographical Latitude based on Ascendant and IMC positions|
-
-#### Helper module : radian conversion functions
-
-| **function** | **parameters**| **description and usage** |
-| :--- | :--- | :--- |
-|**SexagesimalToRadian**|- sexa<br>- fmt (optional)| Expect to have the parameter sexa filled with an angle in sexagesimal notation<br>Exemple: 182°32'10 or 182d32'10 or 182.32.10 or 182 32 10. Separator of the 3 elements can be, by default, one of : °, (space), (dot), (quote), (double-quote), d. Caller can provide a different set of chars as separators.<br>example: ```SexagesimalToRadian("180-00-00", "-") -> Pi value```|
-|**RadianToSexagesimal**|- radian<br>- fmt (optional)| Transform the radian value provided into a string sexagesimal representation. It usee by default degree sign and quote as separtor of degrees and minutes<br>Example: ```RadianToSexagesimal(pi/2) -> "90°00'00"```.<br><br>The caller can provide its own char to separate the sexgesimal parts.<br>Example: ```RadianToSexagesimal(pi/2, "=-") => "90=00-00"```  |
-
-#### Facade module : convenient set of functions that invole the core functions in a more user-friendly way
-
-## Adaptation from initial Pascal implementation
+* **Array functions** (from _Sequences_):
+  + `ComputeLongitudesAllMethodsLatitude`: method A (see above)
+  + `computeLongitudesAllMethodsLongitude`: method B (see above)
