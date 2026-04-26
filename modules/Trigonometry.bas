@@ -1,4 +1,18 @@
 Attribute VB_Name = "Trigonometry"
+
+' This module is part of the application Horosc for Excel (https://github.com/Turbehrt/horosc-Excel),
+' based on John D. North's HOROSC software, after the MS-DOS Pascal code published in
+' John D. North, Horoscopes and History (London: The Warburg Institute, 1986), Appendix 4,
+' as well as its adaptation for Google Sheets by FranÃ§ois J. Tur and Alexandre Tur, 2021-.
+
+' Horosc for Excel is an adaptation in VBA for Microsoft Excel by FranÃ§ois J. Tur and Alexandre Tur, 2025-.
+
+' This software is governed by the CeCILL-B license under French law and
+' abiding by the rules of distribution of free software.  You can  use,
+' modify and/ or redistribute the software under the terms of the CeCILL-B
+' license as circulated by CEA, CNRS and INRIA at the following URL:
+' http://www.cecill.info.
+
 Public Const ERROR_INVALID_FMTCHAR As Long = vbObjectError + 530
 
 ' for a periodic function, ensures the value is within 0 - range, by cutting it by range size
@@ -37,7 +51,7 @@ End Function
 ' Extracts the two triplets of values and delimiters from the sexagesimal value provided in parameters.
 ' Delimiters can be any char that are not numerical
 ' Left most value (the degrees) can be signed
-' @param {sexa} a string showing a sexagesimal value. Eg - 90°30'00" or 90deg30m60s, etc.
+' @param {sexa} a string showing a sexagesimal value. Eg - 90Â°30'00" or 90deg30m60s, etc.
 
 Function SplitSexagesimalFormat(ByVal sexa As String) As Variant
     
@@ -127,7 +141,7 @@ End Function
 ' @customfunction
 
 Function SexagesimalToRadian(ByVal sexa As String) As Double
-    ' input: a string in three elements separated by one of: degree sign (°), dot, single-quote, space, double-quote, "d", semi-colon or any char provided in the seps parameter
+    ' input: a string in three elements separated by one of: degree sign (Â°), dot, single-quote, space, double-quote, "d", semi-colon or any char provided in the seps parameter
     ' first part is the degrees, second part is minutes (0 to 59), third part is seconds (0 to 59)
     ' eg:134.30.25 - would mean 134 degrees and 30 minutes and 25 seconds
     ' return the corresponding value in radian.
@@ -154,7 +168,7 @@ End Function
 ' @customfunction
 
 Function RadianToSexagesimal(ByVal radian As Double, Optional ByVal frm As Variant) As String
-   ' converts an arc valued in radian in the corresponding sexagesimal string representation: ddd°mm'ss"
+   ' converts an arc valued in radian in the corresponding sexagesimal string representation: dddÂ°mm'ss"
    
     Dim dg As Double, d As Integer, m As Integer, s As Integer, sepDeg As String, sepMin As String, sepSeg As String, delims() As String
     sepDeg = ChrW(&HB0) 'degree symbol = U+00B0
