@@ -86,8 +86,8 @@ Les deux méthodes enchaînent les calculs comme suit :
   - calcul des coefficients de qualité (en radians)
   - conversion de la marge d’erreurs en radians et calcul d’un intervalle de latitudes :
     + au centre la valeur théorique (d’après l’ascendant et le fond du ciel fournis)
-    + verticalement, les valeurs en cas d’erreur/approximation de l’ascension droite de l’ascendant
-    + horizontalement, les valeurs en cas d’erreur/approximation de l’ascension droite du fond du ciel
+    + verticalement, les valeurs en cas d’erreur/approximation de l’ascension droite du fond du ciel
+    + horizontalement, les valeurs en cas d’erreur/approximation de l’ascension droite de l’ascendant
   - affichage des résultats
 
 ### Fonctions intermédiaires
@@ -109,8 +109,8 @@ Les deux méthodes enchaînent les calculs comme suit :
   +	`RetrieveLatitudeFromLong(obliquity, longASC, longIMC)` (radians), `RetrieveLatitudeFromLongSexagesimal` (degrés) : calcule la latitude théorique du lieu d’observation à partir de l’obliquité de l’écliptique, et des longitudes de l’ascendant et du fond du ciel (IMC).
   +	`RetrieveLatitudeRange(obliquity, longASC, longIMC, error, direction)` (radians), `RetrieveLatitudeRangeSexagesimal` (degrés) : application d'une marge d'erreur (`error`) dans le calcul de la latitude, en suivant la croix proposée par North
     * `direction = 0` : aucune erreur (identique à `RetrieveLatitude`)
-    * `direction = 1` (haut) ou `direction = 2` (bas) : marge d'erreur appliquée à l'ascension droite de l'ascendant
-    * `direction = 3` (gauche) ou `direction = 4` (droite) : marge d'erreur appliquée à l'ascension droite du fond du ciel
+    * `direction = 1` (gauche) ou `direction = 2` (droite) : marge d'erreur appliquée à l'ascension droite de l'ascendant
+    * `direction = 3` (haut) ou `direction = 4` (bas) : marge d'erreur appliquée à l'ascension droite du fond du ciel
 
 > [!IMPORTANT]
 > La formule `RetrieveLatitudeRange` corrige des incohérences constatées dans le code PASCAL du programme initial. Elle ne retourne donc pas les mêmes résultats que le programme en PASCAL ou que la version 1 de *Horosc for Google Sheets* (mais elle est cohérente avec la version 2 de *Horosc for Google Sheets*). Voir la section [Différences avec le programme initial de J. D. North](#diff%C3%A9rences-avec-le-programme-initial-de-j-d-north) pour plus de détails, et sur la façon de restituer la formule initiale en cas de besoin.
@@ -158,14 +158,11 @@ Plusieurs choix algorithmiques du programme en Pascal, en particulier pour la re
 
 * la composition initiale de la croix des latitudes nous a paru incohérente. Les fonctions `FOI` et `FIO` du code Pascal, correspondant à nos directions 1 et 2 de `RetrieveLatitudeRange` (marge d'erreur appliquée à l'ascendant) retiraient également la marge d'erreur à l'ascension droite du fond du ciel, ce qui n'est pas cohérent avec la logique de calcul. **La correction est appliquée par défaut depuis la version 1 du présent programme.**
 
-
 | `RetrieveLatitude` | | |
 | --- | --- | --- |
-| | (**1**) `RightASC - error`, `RightIMC` |  |
-|  | :x: _(**FOI**) `RightASC - error`, `RightIMC - error`_ |  |
-(**3**) `RightASC`, `RightIMC - error` | (**0**) `RightASC`, `RightIMC` | (**4**) `RightASC`, `RightIMC + error` |
-|  | :x: _(**FIO**) `RightASC + error`, `RightIMC + error`_ |  |
-|  | (**2**) `RightASC + error`, `RightIMC` | | 
+| | (**3**) `RightASC`, `RightIMC + error` |  |
+| (**1**) `RightASC - error`, `RightIMC` | (**0**) `RightASC`, `RightIMC` | (**2**) `RightASC + error`, `RightIMC` |
+| :x: _(**FOI**) `RightASC - error`, `RightIMC - error`_ | (**4**) `RightASC`, `RightIMC - error` | :x: _(**FIO**) `RightASC + error`, `RightIMC + error`_ | 
 
 > [!TIP]
 > Il reste cependant possible de calculer manuellement FOI : `RetrieveLatitude(obliquity, rightASC - error, rightIMC - error)` et FIO : `RetrieveLatitude(obliquity, rightASC + error, rightIMC - error)`.
