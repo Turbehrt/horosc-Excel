@@ -90,8 +90,8 @@ The two methods perform the calculations as follows:
   - calculation of quality coefficients (in radians)
   - conversion of the margin of error into radians and calculation of a latitude interval:
     + at the centre, the theoretical value (based on the ascendant and *Imum Coeli* provided)
-    + vertically, the values in case of error/approximation of the right ascension of the ascendant
-    + horizontally, the values in case of error/approximation of the right ascension of the *Imum Coeli*
+    + vertically, the values in case of error/approximation of the right ascension of the *Imum Coeli*
+    + horizontally, the values in case of error/approximation of the right ascension of the ascendant
   - display of results
 
 ### Intermediate functions
@@ -112,8 +112,8 @@ The two methods perform the calculations as follows:
   + `RetrieveLatitudeFromLong(obliquity, longASC, longIMC)` (radians), `RetrieveLatitudeFromLongSexagesimal` (degrees): calculates the theoretical latitude based on the obliquity and the ecliptic longitudes of the Ascendant and *Imum Coeli* (IMC).
   + `RetrieveLatitudeRange(obliquity, longASC, longIMC, error, direction)` (radians), `RetrieveLatitudeRangeSexagesimal` (degrees): applies an error margin (`error`) to the latitude calculation, following the "cross" method proposed by North.
     * `direction = 0`: no error (identical to `RetrieveLatitude`).
-    * `direction = 1` (up) or `direction = 2` (down): error margin applied to the Ascendant's right ascension.
-    * `direction = 3` (left) or `direction = 4` (right): error margin applied to the *Imum Coeli*'s right ascension.
+    * `direction = 1` (left) or `direction = 2` (right): error margin applied to the Ascendant's right ascension.
+    * `direction = 3` (up) or `direction = 4` (down): error margin applied to the *Imum Coeli*'s right ascension.
 
 > [!IMPORTANT]
 > The `RetrieveLatitudeRange` formula fixes inconsistencies found in the original PASCAL code. Consequently, it does not return the same results as the PASCAL program or version 1 of *Horosc for Google Sheets*, but it is consistent with version 2 of *Horosc for Google Sheets*. See [Differences with J.D. North's original program](#differences-with-jd-norths-original-program) for more details, and how to emulate the original formula.
@@ -163,11 +163,9 @@ Several algorithmic choices in the original Pascal program, particularly regardi
 
 | `RetrieveLatitude` | | |
 | --- | --- | --- |
-| | (**1**) `RightASC - error`, `RightIMC` |  |
-|  | :x: _(**FOI**) `RightASC - error`, `RightIMC - error`_ |  |
-(**3**) `RightASC`, `RightIMC - error` | (**0**) `RightASC`, `RightIMC` | (**4**) `RightASC`, `RightIMC + error` |
-|  | :x: _(**FIO**) `RightASC + error`, `RightIMC + error`_ |  |
-|  | (**2**) `RightASC + error`, `RightIMC` | | 
+| | (**3**) `RightASC`, `RightIMC + error` |  |
+| (**1**) `RightASC - error`, `RightIMC` | (**0**) `RightASC`, `RightIMC` | (**2**) `RightASC + error`, `RightIMC` |
+| :x: _(**FOI**) `RightASC - error`, `RightIMC - error`_ | (**4**) `RightASC`, `RightIMC - error` | :x: _(**FIO**) `RightASC + error`, `RightIMC + error`_ | 
 
 > [!TIP]
 > It remains possible to manually calculate FOI as `RetrieveLatitude(obliquity, rightASC - error, rightIMC - error)` and FIO as `RetrieveLatitude(obliquity, rightASC + error, rightIMC - error)`.
