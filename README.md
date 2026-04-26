@@ -52,9 +52,11 @@ Although it is possible to use these global methods through array formulas in an
 
 The sample spreadsheet thus provides three tabs:
 * **ARRAYS** offers a template to use both methods as array formulas (similar to the model spreadsheet of _[Horosc for Google Sheets](https://github.com/Turbehrt/horosc-GoogleSheets)_)
-* **METHOD A** breaks down the calculations for Method A. The top table converts the arguments from sexagesimal degrees to radians, calculates each longitude and right ascension in radians, and then converts them back to sexagesimal degrees. The second table performs the same calculations directly in degrees (the conversions are not shown).
+* **METHOD A** breaks down the calculations for Method A.
+  - The top table converts the arguments from sexagesimal degrees to radians, calculates each longitude and right ascension in radians, and then converts them back to sexagesimal degrees.
+  - The second table performs the same calculations directly in degrees (the conversions are not shown).
 * **METHOD B** similarly computes
-  - the theoretical longitudes, rigth ascensions and quality coefficients (distance between observed and theoretical longitudes) in radians in the top left corner
+  - the theoretical longitudes, right ascensions and quality coefficients (distance between observed and theoretical longitudes) in radians in the top left corner
   - the same in sexagesimal degrees in the bottom left corner
   - the latitude cross in radians and degrees the top right corner
 
@@ -114,7 +116,7 @@ The two methods perform the calculations as follows:
     * `direction = 3` (left) or `direction = 4` (right): error margin applied to the *Imum Coeli*'s longitude.
 
 > [!IMPORTANT]
-> The `RetrieveLatitudeRange` formula fixes inconsistencies found in the original PASCAL code. Consequently, it does not return the same results as the PASCAL program or version 1 of *Horosc for Google Sheets*, but it is consistent with version 2 of *Horosc for Google Sheets*. See [Differences with J.D. North's original program](#differences-with-jd-norths-original-program) for more details, anf how to emulate the original formula.
+> The `RetrieveLatitudeRange` formula fixes inconsistencies found in the original PASCAL code. Consequently, it does not return the same results as the PASCAL program or version 1 of *Horosc for Google Sheets*, but it is consistent with version 2 of *Horosc for Google Sheets*. See [Differences with J.D. North's original program](#differences-with-jd-norths-original-program) for more details, and how to emulate the original formula.
 
 * **House Division**  (from _Domification_): for each calculation method, functions `Method0(obliquity, geoLatitude, rightASC, rightIMC, houseIndex, getRA)` through `Method6` return either the right ascension (`getRA = true`) or the longitude (`getRA = false`) of a house cusp (`houseIndex` from 1 to 6). Inputs and results are in radians.
   + `Method0`: _Hour Lines method_ (fixed boundaries). Cusps are the intersections of the ecliptic with the horizon, the meridian, and the unequal (even) hour lines. This method is traditionally graphical (using an astrolabe), emulated here via a convergence function (`Converge`).
@@ -132,7 +134,7 @@ The two methods perform the calculations as follows:
   + `QualityCoefficientRadian(observedLongitude, computedLongitude)`, `QualityCoefficientDegree`: these represent the difference between an observed longitude (as transcribed from a historical source) and a calculated longitude.
 
 > [!NOTE]
-> Note that in the original North programme, quality coefficients are expressed in radians, while all other quantities are in sexagesimal degrees.
+> Note that in the original North program, quality coefficients are expressed in radians, while all other quantities are in sexagesimal degrees.
 
 
 * **Global functions** (from _Sequences_): these allow for chained conversions based on available inputs.
@@ -145,15 +147,30 @@ The two methods perform the calculations as follows:
 * **Array functions** (from _Sequences_):
   + `ComputeLongitudesAllMethodsLatitude`: [method A](#method-a) (see above)
   + `computeLongitudesAllMethodsLongitude`: [method B](#method-b) (see above)
+  + auxiliary functions for displaying results: `moveRows`, `fillEmpty`
 
 
 ### Differences with J. D. North's Original Program
 
 Several algorithmic choices in the original Pascal program, particularly regarding latitude retrieval, appeared surprising and were not reproduced identically.
 
-* The calculation of the theoretical latitude assumes that observations always take place in the Northern Hemisphere by applying an absolute value. **This behavior is preserved by default in this program.** Experimentally, an optional `methNorth` argument has been introduced in the `retrieveLatitude` function: if `methNorth = false`, the latitude is modulated between $-\pi/2$ and $\pi/2$ radians. This algorithm has not yet been fully tested; using it is currently not recommended (risk of incorrect or inconsistent results).
+* The calculation of the theoretical latitude assumes that observations always take place in the Northern Hemisphere by applying an absolute value. **This behavior is preserved by default in this program.** Experimentally, an optional `methNorth` argument has been introduced in the `RetrieveLatitude` function: if `methNorth = false`, the latitude is modulated between $-\pi/2$ and $\pi/2$ radians.
 
-* The original composition of the "latitude cross" appeared inconsistent. The `FOI` and `FIO` functions in the Pascal code -- corresponding to our directions 1 and 2 in `RetrieveLatitudeRange` (error margin applied to the Ascendant) -- also subtracted the error margin from the right ascension of the _Immum Coeli_, which is inconsistent with the calculation logic. **This correction has been applied by default since version 1.** It remains possible to manually calculate FOI as `RetrieveLatitude(obliquity, rightASC - error, rightIMC - error)` and FIO as `RetrieveLatitude(obliquity, rightASC + error, rightIMC - error)`.
+> [!WARNING]
+> This algorithm has not yet been fully tested; using it is currently not recommended (risk of incorrect or inconsistent results).
+
+* The original composition of the "latitude cross" appeared inconsistent. The `FOI` and `FIO` functions in the Pascal code -- corresponding to our directions 1 and 2 in `RetrieveLatitudeRange` (error margin applied to the Ascendant) -- also subtracted the error margin from the right ascension of the _Immum Coeli_, which is inconsistent with the calculation logic. **This correction has been applied by default since version 1.**
+
+| `RetrieveLatitude` | | |
+| --- | --- | --- |
+| | (**1**) `RightASC - error`, `RightIMC` |  |
+|  | :x: _(**FOI**) `RightASC - error`, `RightIMC - error`_ |  |
+(**3**) `RightASC`, `RightIMC - error` | (**0**) `RightASC`, `RightIMC` | (**4**) `RightASC`, `RightIMC + error` |
+|  | :x: _(**FIO**) `RightASC + error`, `RightIMC + error`_ |  |
+|  | (**2**) `RightASC + error`, `RightIMC` | | 
+
+> [!TIP]
+> It remains possible to manually calculate FOI as `RetrieveLatitude(obliquity, rightASC - error, rightIMC - error)` and FIO as `RetrieveLatitude(obliquity, rightASC + error, rightIMC - error)`.
 
 * The margins of error used to calculate the "latitude cross" were associated in Pascal with a value in radians that did not actually correspond to their label. **The margins of error announced (in degrees) are used in this program** instead of the old values in radians, which may lead to latitude estimates that differ from those in the initial program).
   + \[D] "1 min. arc" was associated with 0.001745329 rad, in reality 0°06'00"
