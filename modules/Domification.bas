@@ -1,17 +1,18 @@
 Attribute VB_Name = "Domification"
-
 ' This module is part of the application Horosc for Excel (https://github.com/Turbehrt/horosc-Excel),
 ' based on John D. North's HOROSC software, after the MS-DOS Pascal code published in
 ' John D. North, Horoscopes and History (London: The Warburg Institute, 1986), Appendix 4,
-' as well as its adaptation for Google Sheets by FranÃ§ois J. Tur and Alexandre Tur, 2021-.
+' as well as its adaptation for Google Sheets by François J. Tur and Alexandre Tur, 2021-.
 
-' Horosc for Excel is an adaptation in VBA for Microsoft Excel by FranÃ§ois J. Tur and Alexandre Tur, 2025-.
+' Horosc for Excel is an adaptation in VBA for Microsoft Excel by François J. Tur and Alexandre Tur, 2025-.
 
 ' This software is governed by the CeCILL-B license under French law and
 ' abiding by the rules of distribution of free software.  You can  use,
 ' modify and/ or redistribute the software under the terms of the CeCILL-B
 ' license as circulated by CEA, CNRS and INRIA at the following URL:
 ' http://www.cecill.info.
+
+' ----------
 
 ' Convention names :
 ' obliquity is the obliquity of the ecliptic
@@ -20,7 +21,7 @@ Attribute VB_Name = "Domification"
 ' Any domification method computes the cusps of each House (1 to 6, with houses 7 to 12 being symetrical).
     ' they come as right Ascensions (on the equinox, usually noted alpha) or longitudes (on the ecliptic, usually noted lambda).
 ' Meaningful cusps are the Ascendant (Asc, cusp of House 1, intersection of ecliptic and horizon) and the Immum Caeli (IMC, cusp of House 4, intersection of ecliptic and night meridian)
-    ' right ascension of the ascendant - ascensional difference = right ascension of the IMC - 90Â°
+    ' right ascension of the ascendant - ascensional difference = right ascension of the IMC - 90°
 ' Houses 7 to 12 are symetrical to Houses  to 6 in all methods (cusp + 180)
 
 Const middleSkyCuspIndex = 4
@@ -169,7 +170,7 @@ Function RetrieveLatitudeRange(ByVal obliquity As Double, ByVal longASC As Doubl
         ' 0 Exact value
         RetrieveLatitudeRange = RetrieveLatitude(obliquity, rightASC, rightIMC)
         
-    ' Case 1 (uppper) and 2 (lower) : assumption that the astrologer started from the ascendent (+/- max error)
+    ' Case 1 (left) and 2 (right) : assumption that the astrologer started from the ascendent (+/- max error)
     Case 1
         ' 1 rightASC - error
         ' NOTE: it is a change from initial program
@@ -181,7 +182,7 @@ Function RetrieveLatitudeRange(ByVal obliquity As Double, ByVal longASC As Doubl
         ' Initial program: FIO = RetrieveLatitudeRange = retrieveLatitude(obliquity, rightASC + error, rightIMC - error)
         RetrieveLatitudeRange = RetrieveLatitude(obliquity, rightASC + error, rightIMC)
     
-    ' Case 3 (left) and 4 (right) : assumption that the astrologer started from the MC (+/- max error)
+    ' Case 3 (top) and 4 (bottom) : assumption that the astrologer started from the MC (+/- max error)
     Case 3
         ' 3 rightIMC + error
         RetrieveLatitudeRange = RetrieveLatitude(obliquity, rightASC, rightIMC + error)
