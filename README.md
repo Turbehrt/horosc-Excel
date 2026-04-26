@@ -11,31 +11,62 @@ Due to the obsolescence of the Pascal language, this application became very dif
 
 The way Google Apps Script works favors the execution of complete methods (not unlike the initial Horosc program) instead of a more flexible use of intermediate functions. This project, launched in 2025, ports the code to VBA for Microsoft Excel, creating a wider range of functions to be combined in different and more customized way.
 
-It is currently inprogress.
+> [!TIP]
+> Since version 2 of _[Horosc for Google Sheets](https://github.com/Turbehrt/horosc-GoogleSheets)_, both applications use the same functions and arguments names, so as to facilitate parallel use. Running the Excel spreadsheet on a local computer tends to be faster than loading cloud-based Google Apps scripts, especially when calling several intermediate functions. However, this requires macros to be enabled.
 
-## Proposition for two methods of computation
+## General principle
 
-### Method A : Compute cusp of houses from known points, using different historical methods
+The programme written by John D. North offered two approaches:
 
-Providing you already have:
+### Method A
 
-- Obliquity
-- Geographical Latitude
-- Longitude of ascendant
+Knowing:
+*    the value of the obliquity of the ecliptic,
+*    the geographical latitude of the observation location,
+*    and the ecliptic longitude of the Ascendant
 
-The function `computeCuspFromLatitude` computes the longitudes and right ascensions for a specific house (1 to 6) and a specific method (0 to 6)
+the application provides:
 
-### Method B: Evaluate the accuracy of observed longitudes
+* the theoretical calculation of the sexagesimal longitudes and/or right ascensions of the first 6 houses (the next 6 are inferred by symmetry) according to the 7 historical house systems
 
-providing you already have:
+This method is reproduced here by the array formula `computeLongitudesAllMethodsLatitude(obliquity of the ecliptic, geographical latitude, longitude of the ascendant, number of lines)`.
+It produces two tables, one for longitudes and one for right ascensions, separated by the number of lines entered.
 
-- Obliquity
-- Observed longitudes of the houses
+### Method B
 
-The function `retrieveLatitudeFromLong` will return the geographical Latitude
-the function `RetrieveLatitudeRange` will provide insights on variation of the Latitude when applying an Error RTange on either ascendant or IMC
-The function `computeCuspFromLongitude` will computes the theorical longitudes and right ascensions for a specific house (1 to 6) and a specific method (0 to 6). It will consider observed longitudes for house 1 and 4 as correct.
-You can then use the `QualityCoefficient` function to get the comparison between observed longitude and theorical longitude
+Knowing:
+*    the value of the obliquity of the ecliptic,
+*    the longitudes of the first 6 houses (transcribed from a historical source),
+*    and a margin of error or rounding
+
+the application provides:
+*    a theoretical calculation of the latitude of the observation site (with an interval corresponding to the margin of error, applied to the right ascension of the ascendant or midheaven)
+*    a comparison with the theoretical longitudes (calculated considering only the ascendant and the midheaven) according to the seven historical house systems, with a quality coefficient (generally allowing the method actually used to be identified)
+
+This method is reproduced here by the array formula `computeLongitudesAllMethodsLongitude(obliquity of the ecliptic, longitudes of the 6 houses, margin of error, number of lines)`.
+It produces four tables: theoretical longitudes, quality coefficients, right ascensions and geographical latitude interval.
+
+### Excel implementation
+
+Although it is possible to use these global methods through array formulas in an Excel spreadsheet, the advantage rather lies in reconstituting them by using intermediate formulas.
+
+The sample spreadsheet thus provides three tabs:
+* **ARRAYS** offers a template to use both methods as array formulas (similar to the model spreadsheet of _[Horosc for Google Sheets](https://github.com/Turbehrt/horosc-GoogleSheets)_)
+* **METHOD A** breaks down the calculations for Method A. The top table converts the arguments from sexagesimal degrees to radians, calculates each longitude and right ascension in radians, and then converts them back to sexagesimal degrees. The second table performs the same calculations directly in degrees (the conversions are not shown).
+* **METHOD B** similarly computes
+  - the theoretical longitudes, rigth ascensions and quality coefficients (distance between observed and theoretical longitudes) in radians in the top left corner
+  - the same in sexagesimal degrees in the bottom left corner
+  - the latitude cross in radians and degrees the top right corner
+
+Unlike in ARRAYS, each cell of METHOD A and METHOD B is the result of a single formula. Those fomulas can be used in other cells, or imported to other Excel projects by copying the three VBA modules.
+
+> [!NOTE]
+> In the proposed templates (as in the original Horosc programme), all input numbers are expected to be expressed in degrees in sexagesimal form. Separators provided in the input, if consistant, are reused in the output (ex: 187.12'04, 187°12'04'', 187d 12m). However, it is possible to use formulas to compute from inputs in decimal radians.
+> 
+> When comparing with data from the original North programme, or with _[Horosc for Google Sheets](https://github.com/Turbehrt/horosc-GoogleSheets)_, note that resulting longitudes, right ascensions and geographical latitudes are expected to be expressed in sexagesimal degrees, but quality coefficients in radians.
+
+
+
 
 ## The 7 methods for computing cusp of houses
 
