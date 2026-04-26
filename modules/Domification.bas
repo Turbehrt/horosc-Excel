@@ -1,4 +1,18 @@
 Attribute VB_Name = "Domification"
+
+' This module is part of the application Horosc for Excel (https://github.com/Turbehrt/horosc-Excel),
+' based on John D. North's HOROSC software, after the MS-DOS Pascal code published in
+' John D. North, Horoscopes and History (London: The Warburg Institute, 1986), Appendix 4,
+' as well as its adaptation Google Sheets by François J. Tur and Alexandre Tur, 2021-.
+
+' Horosc for Excel is an adaptation in VBA for Microsoft Excel by François J. Tur and Alexandre Tur, 2025-.
+
+' This software is governed by the CeCILL-B license under French law and
+' abiding by the rules of distribution of free software.  You can  use,
+' modify and/ or redistribute the software under the terms of the CeCILL-B
+' license as circulated by CEA, CNRS and INRIA at the following URL:
+' http://www.cecill.info.
+
 ' Convention names :
 ' obliquity is the obliquity of the ecliptic
 ' geoLat is the geographical latitude of the place (usually phi), equivalent to the elevation of the poles (over the horizon)
@@ -6,7 +20,7 @@ Attribute VB_Name = "Domification"
 ' Any domification method computes the cusps of each House (1 to 6, with houses 7 to 12 being symetrical).
     ' they come as right Ascensions (on the equinox, usually noted alpha) or longitudes (on the ecliptic, usually noted lambda).
 ' Meaningful cusps are the Ascendant (Asc, cusp of House 1, intersection of ecliptic and horizon) and the Immum Caeli (IMC, cusp of House 4, intersection of ecliptic and night meridian)
-    ' right ascension of the ascendant - ascensional difference = right ascension of the IMC - 90�
+    ' right ascension of the ascendant - ascensional difference = right ascension of the IMC - 90°
 ' Houses 7 to 12 are symetrical to Houses  to 6 in all methods (cusp + 180)
 
 Const middleSkyCuspIndex = 4
