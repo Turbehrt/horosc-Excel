@@ -16,7 +16,7 @@ The way Google Apps Script works favors the execution of complete methods (not u
 
 ## General principle
 
-The programme written by John D. North offered two approaches:
+The program written by John D. North offered two approaches:
 
 ### Method A
 
@@ -143,5 +143,19 @@ The two methods perform the calculations as follows:
   + `computeCuspFromLongitudeInSexagesimal`: computes the coordinates (right ascension or longitude) of the cusp of any house (1-6), based on any method (0-6), using the longitudes of the Ascendant and _Immum Coeli_ (in degrees).
 
 * **Array functions** (from _Sequences_):
-  + `ComputeLongitudesAllMethodsLatitude`: method A (see above)
-  + `computeLongitudesAllMethodsLongitude`: method B (see above)
+  + `ComputeLongitudesAllMethodsLatitude`: [method A](#method-a) (see above)
+  + `computeLongitudesAllMethodsLongitude`: [method B](#method-b) (see above)
+
+
+### Differences with J. D. North's Original Program
+
+Several algorithmic choices in the original Pascal program, particularly regarding latitude retrieval, appeared surprising and were not reproduced identically.
+
+* The calculation of the theoretical latitude assumes that observations always take place in the Northern Hemisphere by applying an absolute value. **This behavior is preserved by default in this program.** Experimentally, an optional `methNorth` argument has been introduced in the `retrieveLatitude` function: if `methNorth = false`, the latitude is modulated between $-\pi/2$ and $\pi/2$ radians. This algorithm has not yet been fully tested; using it is currently not recommended (risk of incorrect or inconsistent results).
+
+* The original composition of the "latitude cross" appeared inconsistent. The `FOI` and `FIO` functions in the Pascal code -- corresponding to our directions 1 and 2 in `RetrieveLatitudeRange` (error margin applied to the Ascendant) -- also subtracted the error margin from the right ascension of the _Immum Coeli_, which is inconsistent with the calculation logic. **This correction has been applied by default since version 1.** It remains possible to manually calculate FOI as `RetrieveLatitude(obliquity, rightASC - error, rightIMC - error)` and FIO as `RetrieveLatitude(obliquity, rightASC + error, rightIMC - error)`.
+
+* The margins of error used to calculate the "latitude cross" were associated in Pascal with a value in radians that did not actually correspond to their label. **The margins of error announced (in degrees) are used in this program** instead of the old values in radians, which may lead to latitude estimates that differ from those in the initial program).
+  + \[D] "1 min. arc" was associated with 0.001745329 rad, in reality 0°06'00"
+  + \[E] "half min." was associated with 0.00087266 rad, in reality 0°03'00"
+  + \[F] "1 sec. arc" was associated with 0.000029089 rad, in reality 0°00'06"
