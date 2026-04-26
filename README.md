@@ -63,9 +63,9 @@ The sample spreadsheet thus provides three tabs:
 Unlike in ARRAYS, each cell of METHOD A and METHOD B is the result of a single formula. Those fomulas can be used in other cells, or imported to other Excel projects by copying the three VBA modules.
 
 > [!NOTE]
-> In the proposed templates (as in the original Horosc programme), all input numbers are expected to be expressed in degrees in sexagesimal form. Separators provided in the input, if consistant, are reused in the output (ex: 187.12'04, 187°12'04'', 187d 12m). However, it is possible to use formulas to compute from inputs in decimal radians.
+> In the proposed templates (as in the original Horosc program), all input numbers are expected to be expressed in degrees in sexagesimal form. Separators provided in the input, if consistant, are reused in the output (ex: 187.12'04, 187°12'04'', 187d 12m). However, it is possible to use formulas to compute from inputs in decimal radians.
 > 
-> When comparing with data from the original North programme, or with _[Horosc for Google Sheets](https://github.com/Turbehrt/horosc-GoogleSheets)_, note that resulting longitudes, right ascensions and geographical latitudes are expected to be expressed in sexagesimal degrees, but quality coefficients in radians.
+> When comparing with data from the original Horosc programme, or with _[Horosc for Google Sheets](https://github.com/Turbehrt/horosc-GoogleSheets)_, note that resulting longitudes, right ascensions and geographical latitudes are expected to be expressed in sexagesimal degrees, but quality coefficients in radians.
 
 ## Calculation methods and intermediate functions
 
@@ -111,9 +111,9 @@ The two methods perform the calculations as follows:
   + `RetrieveLatitude(obliquity, rightASC, rightIMC)` (radians), `RetrieveLatitudeSexagesimal` (degrees): calculates the theoretical latitude of the observation site based on the obliquity of the ecliptic and the right ascensions of the Ascendant and *Imum Coeli* (IMC).
   + `RetrieveLatitudeFromLong(obliquity, longASC, longIMC)` (radians), `RetrieveLatitudeFromLongSexagesimal` (degrees): calculates the theoretical latitude based on the obliquity and the ecliptic longitudes of the Ascendant and *Imum Coeli* (IMC).
   + `RetrieveLatitudeRange(obliquity, longASC, longIMC, error, direction)` (radians), `RetrieveLatitudeRangeSexagesimal` (degrees): applies an error margin (`error`) to the latitude calculation, following the "cross" method proposed by North.
-    * `direction = 0`: no error (identical to `retrieveLatitude`).
-    * `direction = 1` (up) or `direction = 2` (down): error margin applied to the Ascendant's longitude.
-    * `direction = 3` (left) or `direction = 4` (right): error margin applied to the *Imum Coeli*'s longitude.
+    * `direction = 0`: no error (identical to `RetrieveLatitude`).
+    * `direction = 1` (up) or `direction = 2` (down): error margin applied to the Ascendant's right ascension.
+    * `direction = 3` (left) or `direction = 4` (right): error margin applied to the *Imum Coeli*'s right ascension.
 
 > [!IMPORTANT]
 > The `RetrieveLatitudeRange` formula fixes inconsistencies found in the original PASCAL code. Consequently, it does not return the same results as the PASCAL program or version 1 of *Horosc for Google Sheets*, but it is consistent with version 2 of *Horosc for Google Sheets*. See [Differences with J.D. North's original program](#differences-with-jd-norths-original-program) for more details, and how to emulate the original formula.
@@ -130,7 +130,7 @@ The two methods perform the calculations as follows:
 > [!NOTE]
 > Detailed explanation and historical use of each method are to be found by John D. North, *Horoscopes and History*, London: Warburg Institute, 1986.
 
-* **Quality Coefficients**
+* **Quality Coefficients** (from _Domification_)
   + `QualityCoefficientRadian(observedLongitude, computedLongitude)`, `QualityCoefficientDegree`: these represent the difference between an observed longitude (as transcribed from a historical source) and a calculated longitude.
 
 > [!NOTE]
@@ -141,7 +141,7 @@ The two methods perform the calculations as follows:
   + `computeCuspWithMethodInRadian(obliquity, geoLatitude, rightASC, longASC, rightIMC, longIMC, houseIndex, method, getRA)`: computes the coordinates (right ascension or longitude) of the cusp of any house (1-6), based on any method (0-6), using all known parameters: obliquity, geographical latitude, right ascensions and longitudes of the Ascendant and _Immum Coeli_ (in radians)
   + `computeCuspFromLatitudeInRadian(obliquity, geoLatitude, longASC, houseIndex, method, getRA)`: computes the coordinates (right ascension or longitude) of the cusp of any house (1-6), based on any method (0-6), using the Ascendant's longitude and the geographic latitude (in radians) -- without knowing the coordinates of the _Immum Coeli_.
   + `computeCuspFromLatitudeInSexagesimal`: computes the coordinates (right ascension or longitude) of the cusp of any house (1-6), based on any method (0-6), using the Ascendant's longitude and the geographic latitude (in degrees).
-  + `computeCuspFromLongitudeInRadian(obliquity, longASC, longIMC, houseIndex, method, getRA)`: computes the coordinates (right ascension or longitude) of the cusp of any house (1-6), based on any method (0-6), using the longitudes of the Ascendant and _Immum Coeli_ (in radians).
+  + `computeCuspFromLongitudeInRadian(obliquity, longASC, longIMC, houseIndex, method, getRA)`: computes the coordinates (right ascension or longitude) of the cusp of any house (1-6), based on any method (0-6), using the longitudes of the Ascendant and _Immum Coeli_ (in radians) -- without knowing any right ascension nor the geographic latitude.
   + `computeCuspFromLongitudeInSexagesimal`: computes the coordinates (right ascension or longitude) of the cusp of any house (1-6), based on any method (0-6), using the longitudes of the Ascendant and _Immum Coeli_ (in degrees).
 
 * **Array functions** (from _Sequences_):
