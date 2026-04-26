@@ -1,4 +1,18 @@
 Attribute VB_Name = "Sequences"
+
+' This module is part of the application Horosc for Excel (https://github.com/Turbehrt/horosc-Excel),
+' based on John D. North's HOROSC software, after the MS-DOS Pascal code published in
+' John D. North, Horoscopes and History (London: The Warburg Institute, 1986), Appendix 4,
+' as well as its adaptation for Google Sheets by François J. Tur and Alexandre Tur, 2021-.
+
+' Horosc for Excel is an adaptation in VBA for Microsoft Excel by François J. Tur and Alexandre Tur, 2025-.
+
+' This software is governed by the CeCILL-B license under French law and
+' abiding by the rules of distribution of free software.  You can  use,
+' modify and/ or redistribute the software under the terms of the CeCILL-B
+' license as circulated by CEA, CNRS and INRIA at the following URL:
+' http://www.cecill.info.
+
 Public Const ERROR_INVALID_METHOD As Long = vbObjectError + 514
 Public Const ERROR_INVALID_RANGE As Long = vbObjectError + 515
 Public Const ERROR_INVALID_INDEX As Long = vbObjectError + 516
