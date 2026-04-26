@@ -1,4 +1,4 @@
-# Horosc pour Google Sheets
+# Horosc pour Excel
 
 [![en](https://img.shields.io/badge/lang-en-red.svg)](/README.md)
 [![fr](https://img.shields.io/badge/lang-fr-blue.svg)](/README.fr.md)
